@@ -1,0 +1,4 @@
+{
+    "name": "Oauth2 Plugin",
+    "route": "/admin/oauth2/clients"
+}

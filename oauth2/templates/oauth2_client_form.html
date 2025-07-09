@@ -1,0 +1,89 @@
+{% extends "admin/base.html" %}
+
+{% block stylesheets %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>
+      {% if client %}
+      Edit OAuth2 Client
+      {% else %}
+      Add OAuth2 Client
+      {% endif %}
+    </h1>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+      {% set content = page.content if page is defined else "" %}
+      {% set format = page.format if page is defined %}
+      {% with form = Forms.pages.PageEditForm(content=content, format=format) %}
+      <form method="POST">
+        <div class="form-group">
+          <label for="name">Provider Name</label>
+          <input type="text" class="form-control" id="name" name="name" value="{{ client.name if client else '' }}"
+            required>
+          <small class="form-text text-muted">
+            Display name for this OAuth provider (e.g., "Cognito", "GitHub")
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="client_id">Client ID</label>
+          <input type="text" class="form-control" id="client_id" name="client_id"
+            value="{{ client.client_id if client else '' }}" required>
+          <small class="form-text text-muted">
+            OAuth2 Client ID from your provider
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="client_secret">Client Secret</label>
+          <input type="password" class="form-control" id="client_secret" name="client_secret"
+            value="{{ client.client_secret if client else '' }}" required>
+          <small class="form-text text-muted">
+            OAuth2 Client Secret from your provider
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="authorization_url">Authorization URL</label>
+          <input type="url" class="form-control" id="authorization_url" name="authorization_url"
+            value="{{ client.authorization_url if client else '' }}" required>
+          <small class="form-text text-muted">
+            OAuth2 Authority URL
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label for="scope">Scope</label>
+          <input type="text" class="form-control" id="scope" name="scope"
+            value="{{ client.scope if client else 'openid email profile' }}">
+          <small class="form-text text-muted">
+            OAuth2 scopes to request (space-separated)
+          </small>
+        </div>
+
+
+        <div class="form-group">
+          {{ form.nonce() }}
+          <button type="submit" class="btn btn-primary">
+            {% if client %}
+            Update Client
+            {% else %}
+            Create Client
+            {% endif %}
+          </button>
+          <a href="{{ url_for('oauth2_clients') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+      </form>
+      {% endwith %}
+    </div>
+  </div>
+</div>
+{% endblock %}

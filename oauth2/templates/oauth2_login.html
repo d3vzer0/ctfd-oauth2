@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>Login</h1>
+  </div>
+</div>
+<div class="container container-bg">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <h2>Sign in with</h2>
+      <br>
+      {% for client in clients %}
+      <a class="col-md-3 offset-md-4 float-left align-text-to-button btn btn-md btn-primary btn-outlined"
+        href="{{ url_for('oauth2_login_start', provider_id=client.id) }}">
+        {{ client.name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

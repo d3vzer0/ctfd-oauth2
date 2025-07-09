@@ -1,0 +1,77 @@
+{% extends "admin/base.html" %}
+
+{% block stylesheets %}
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+  <div class="container">
+    <h1>OAuth2 Clients</h1>
+    <p>Manage OAuth2 authentication providers</p>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="mb-3">
+        <a href="{{ url_for('oauth2_client_create') }}" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Add New Client
+        </a>
+      </div>
+
+      {% if clients %}
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Client ID</th>
+              <th>Authorization URL</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for client in clients %}
+            <tr>
+              <td>{{ client.name }}</td>
+              <td>
+                {{ client.client_id[:20] }}...
+              </td>
+              <td>
+                {{ client.authorization_url }}
+              </td>
+              <td>
+                <div class="btn-group" role="group">
+                  <a href="{{ url_for('oauth2_client_edit', client_id=client.id) }}"
+                    class="btn btn-sm btn-outline-primary">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  {% set content = page.content if page is defined else "" %}
+                  {% set format = page.format if page is defined %}
+                  {% with form = Forms.pages.PageEditForm(content=content, format=format) %}
+                  <form method="POST" action="{{ url_for('oauth2_client_delete', client_id=client.id) }}" class="d-inline">
+                    {{ form.nonce() }}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                  {% endwith %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        No OAuth2 clients configured. <a href="{{ url_for('oauth2_client_create') }}">Add one now</a>.
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
