@@ -38,4 +38,4 @@ TODO: Add the option to configure flows using Authorization Code with PKCE so cl
    - **Provider Name**: Display name (e.g., "Google", "GitHub")
    - **Client ID**: OAuth2 Client ID from your provider
    - **Client Secret**: OAuth2 Client Secret from your provider
-   - **Authorization URL**: Provider's authorization endpooint
+   - **Authority URL**: Provider's Authority URL
