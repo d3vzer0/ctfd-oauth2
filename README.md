@@ -5,8 +5,8 @@ An OAuth2 authentication plugin for CTFd that allows users to authenticate using
 ## Features
 
 - **Multiple OAuth2 Providers**: Support for any OAuth2-compliant provider
-- **Dynamic Configuration**: Add/remove providers through the admin interface
-- **Database Storage**: OAuth2 client configurations stored in database
+- **Dynamic Configuration**: Add/remove providers through the CTFd admin interface
+- **Database Storage**: OAuth2 client configurations stored in CTFd database
 - **Authlib**: Uses Authlib for standardized and secure defaults for OAuth2 handling
 
 ##
