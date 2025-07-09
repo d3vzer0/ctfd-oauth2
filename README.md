@@ -19,18 +19,13 @@ TODO: Add the option to configure flows using Authorization Code with PKCE so cl
    cd /path/to/CTFd/plugins
    git clone <repository-url> oauth2
    ```
-
 2. Install required dependencies:
    ```bash
    pip install authlib
    ```
-
 3. Restart CTFd to load the plugin
 
-4. Navigate to Admin → Oauth2 Plugin to configure providers
-
 ## Configuration
-
 ### Adding an OAuth2 Provider
 1. Go to **Admin Panel** → **Oauth2 Plugin**
 2. Click **Add New Client**
@@ -39,3 +34,6 @@ TODO: Add the option to configure flows using Authorization Code with PKCE so cl
    - **Client ID**: OAuth2 Client ID from your provider
    - **Client Secret**: OAuth2 Client Secret from your provider
    - **Authority URL**: Provider's Authority URL
+
+## Authentication
+Navigate to http(s)://your.ctfdhost.io/oauth2 and select any of the configured Oauth2 providers
