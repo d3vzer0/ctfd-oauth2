@@ -5,6 +5,7 @@ from CTFd.utils.decorators import admins_only
 from CTFd.utils.security.auth import login_user
 from wtforms import Form, StringField
 from authlib.integrations.flask_client import OAuth
+from sqlalchemy import update
 import os
 
 
@@ -87,6 +88,7 @@ def load(app):
 
         token = client.authorize_access_token()
         user_info = client.userinfo(token=token)
+        print(user_info)
 
         account = Users.query.filter_by(email=user_info["email"]).first()
         if not account:
@@ -119,11 +121,22 @@ def load(app):
         db.session.commit()  # type: ignore
         return redirect(url_for('oauth2_clients'))
 
-    @app.route('/admin/oauth2/clients/edit/<client_id>', methods=['GET'])
+    @app.route('/admin/oauth2/clients/edit/<client_id>', methods=['GET', 'POST'])
     @admins_only
     def oauth2_client_edit(client_id: str):
         client = Oauth2Config.query.get_or_404(client_id)
-        return render_template('oauth2_client_form.html', client=client)
+        if request.method == 'GET':
+            return render_template('oauth2_client_form.html', client=client)
+        else:
+            form = Oauth2ClientForm(request.form)
+            # update_provider = update(Oauth2Config).where(Oauth2Config.id == client_id).values(name=form.name.data,
+            #     client_id=form.client_id.data,
+            #     client_secret=form.client_secret.data,
+            #     authority_url=form.authority_url.data,
+            #     scope=form.scope.data)
+            # db.session.add(update_provider)
+            # db.session.commit()  # type: ignore
+            return redirect(url_for('oauth2_clients'))
 
     @app.route('/admin/oauth2/clients/create', methods=['GET', 'POST'])
     @admins_only

@@ -52,9 +52,9 @@
         </div>
 
         <div class="form-group">
-          <label for="authorization_url">Authorization URL</label>
-          <input type="url" class="form-control" id="authorization_url" name="authorization_url"
-            value="{{ client.authorization_url if client else '' }}" required>
+          <label for="authority_url">Autority URL</label>
+          <input type="url" class="form-control" id="authority_url" name="authority_url"
+            value="{{ client.authority_url if client else '' }}" required>
           <small class="form-text text-muted">
             OAuth2 Authority URL
           </small>
@@ -63,7 +63,7 @@
         <div class="form-group">
           <label for="scope">Scope</label>
           <input type="text" class="form-control" id="scope" name="scope"
-            value="{{ client.scope if client else 'openid email profile' }}">
+            value="{{ client.scope if client else 'openid email phone' }}">
           <small class="form-text text-muted">
             OAuth2 scopes to request (space-separated)
           </small>
