@@ -74,9 +74,16 @@ def load(app):
         if client is None:
             return redirect(url_for('oauth2_login'))
 
-        redirect_uri = url_for('oauth2_login_callback',
-                               provider_id=provider_id,
-                               _external=True)
+        if os.getenv('FLASK_ENV') == 'development':
+            redirect_uri = url_for('oauth2_login_callback',
+                                   provider_id=provider_id,
+                                   _external=True)
+        else:
+            redirect_uri = url_for('oauth2_login_callback',
+                                   provider_id=provider_id,
+                                   _external=True,
+                                   _scheme='https')
+
         return client.authorize_redirect(redirect_uri)
 
     @app.route('/oauth2/login/<provider_id>/callback')
