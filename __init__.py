@@ -5,7 +5,6 @@ from CTFd.utils.decorators import admins_only
 from CTFd.utils.security.auth import login_user
 from wtforms import Form, StringField
 from authlib.integrations.flask_client import OAuth
-from sqlalchemy import update
 import os
 
 
@@ -40,9 +39,7 @@ def load(app):
 
     app.db.create_all()
 
-    custom_auth = flask.Blueprint("oauth2", __name__,
-                                  template_folder="templates",
-                                  static_folder="assets")
+    custom_auth = flask.Blueprint("oauth2", __name__, template_folder="templates", static_folder="assets")
     app.register_blueprint(custom_auth)
 
     oauth = OAuth(app)
@@ -72,18 +69,22 @@ def load(app):
         provider = Oauth2Config.query.get_or_404(provider_id)
         client = oauth.create_client(provider.name.lower())
         if client is None:
-            return redirect(url_for('oauth2_login'))
+            well_known = f'{provider.authority_url}/.well-known/openid-configuration'
+            oauth.register(
+                    name=provider.name.lower(),
+                    authority=provider.authority_url,
+                    client_id=provider.client_id,
+                    client_secret=provider.client_secret,
+                    server_metadata_url=well_known,
+                    client_kwargs={'scope': provider.scope}
+                )
+            client = oauth.create_client(provider.name.lower())
 
-        if os.getenv('FLASK_ENV') == 'development':
-            redirect_uri = url_for('oauth2_login_callback',
-                                   provider_id=provider_id,
-                                   _external=True)
-        else:
-            redirect_uri = url_for('oauth2_login_callback',
-                                   provider_id=provider_id,
-                                   _external=True,
-                                   _scheme='https')
+        redirect_params = {'provider_id': provider_id, '_external': True}
+        if os.getenv('FLASK_ENV') != 'development':
+            redirect_params['_scheme'] = 'https'
 
+        redirect_uri = url_for('oauth2_login_callback', **redirect_params)
         return client.authorize_redirect(redirect_uri)
 
     @app.route('/oauth2/login/<provider_id>/callback')
@@ -136,13 +137,15 @@ def load(app):
             return render_template('oauth2_client_form.html', client=client)
         else:
             form = Oauth2ClientForm(request.form)
-            # update_provider = update(Oauth2Config).where(Oauth2Config.id == client_id).values(name=form.name.data,
-            #     client_id=form.client_id.data,
-            #     client_secret=form.client_secret.data,
-            #     authority_url=form.authority_url.data,
-            #     scope=form.scope.data)
-            # db.session.add(update_provider)
-            # db.session.commit()  # type: ignore
+            db.session.query(Oauth2Config).filter_by(id=client_id).update({
+                'name': form.name.data,
+                'client_id': form.client_id.data,
+                'client_secret': form.client_secret.data,
+                'scope': form.scope.data,
+                'authority_url': form.authority_url.data
+
+            })
+            db.session.commit()  # type: ignore
             return redirect(url_for('oauth2_clients'))
 
     @app.route('/admin/oauth2/clients/create', methods=['GET', 'POST'])
