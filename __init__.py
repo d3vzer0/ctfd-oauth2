@@ -6,6 +6,9 @@ from CTFd.utils.security.auth import login_user
 from wtforms import Form, StringField
 from authlib.integrations.flask_client import OAuth
 import os
+import logging
+
+logger = logging.getLogger("oauth2")
 
 
 class Oauth2Config(db.Model):  # type: ignore
@@ -38,7 +41,7 @@ def load(app):
         app.config['SERVER_NAME'] = 'localhost:4000'
 
     app.db.create_all()
-
+    original_login = app.view_functions['auth.login']
     custom_auth = flask.Blueprint("oauth2", __name__, template_folder="templates", static_folder="assets")
     app.register_blueprint(custom_auth)
 
@@ -55,6 +58,17 @@ def load(app):
             server_metadata_url=well_known,
             client_kwargs={'scope': client.scope}
         )
+
+    @app.route('/loginfallback')
+    def login_fallback():
+        return original_login()
+
+    @app.before_request
+    def override_login():
+        if request.path == '/login':
+            get_first_auth = Oauth2Config.query.first()
+            redirect_uri = f"/oauth2/login/{get_first_auth.id}"
+            return redirect(redirect_uri)
 
     # Section for oauth2 login flow
     @app.route('/oauth2', methods=['GET'])
@@ -96,8 +110,6 @@ def load(app):
 
         token = client.authorize_access_token()
         user_info = client.userinfo(token=token)
-        print(user_info)
-
         account = Users.query.filter_by(email=user_info["email"]).first()
         if not account:
             account = Users(
