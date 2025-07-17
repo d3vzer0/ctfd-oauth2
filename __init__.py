@@ -59,7 +59,7 @@ def load(app):
             client_kwargs={'scope': client.scope}
         )
 
-    @app.route('/loginfallback')
+    @app.route('/loginfallback', methods=['GET', 'POST'])
     def login_fallback():
         return original_login()
 
