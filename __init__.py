@@ -112,8 +112,9 @@ def load(app):
         user_info = client.userinfo(token=token)
         account = Users.query.filter_by(email=user_info["email"]).first()
         if not account:
+            username = user_info["custom:xusername"] if "custom:xusername" in user_info else user_info["email"]
             account = Users(
-                name=user_info["email"],
+                name=username,
                 email=user_info["email"],
                 type="user",
                 verified=True
